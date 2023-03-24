@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.oracle.s20221103.FreeBoardMapper">
+
+	<select id="selFreeTotal" resultType="int">
+		select count(*) from freeboard 
+	</select>
+
+	<select id="selFreeList" resultType="FreeBoard" parameterType="Page">
+		SELECT * 
+		FROM (
+			SELECT rownum rn, a.*
+			FROM (
+				SELECT f.* 
+				FROM freeboard f 
+				ORDER BY f.freeboard_no desc) a ) b, 
+			member m 
+		WHERE b.id = m.id AND rn BETWEEN #{start} and #{end} 
+	</select> 
+	
+	<select id="selFreeListWithCri" parameterType="Criteria" resultType="FreeBoard">
+		<![CDATA[
+			select 
+				FREEBOARD_NO,TITLE,CONTENT,CATEGORY,regdate  ,view_count,recommand,memberId, username
+			from 
+				(select /*+INDEX_DESC(freeboard PK_FREEBOARD) */
+		    		rownum rn, freeboard_no,title,content,category ,regdate,view_count,recommand, f.id AS memberId, m.username AS username
+		    	from 
+		    		freeboard f,member m 
+                    where f.id=m.id and  rownum <= #{pageNum} * #{amount})
+		    where rn > (#{paageNum}-1) * #{amount}
+		]]>
+	
+	</select>
+	<!-- ;;;;;;조심... -->
+	<select id="selFree" parameterType="long" resultType="FreeBoard">
+		select 
+			*
+		from
+			freeboard f , member m
+		where 
+            f.id = m.id
+        and
+			f.freeboard_no=#{freeboardNo}
+	</select>
+	
+	
+	<!-- Id 추가할 예정 -->
+	<insert id="insFree" parameterType="FreeBoard" useGeneratedKeys="true" keyProperty="freeboardNo" keyColumn="freeboard_no">
+	INSERT INTO freeboard
+	VALUES (FREEBOARD_SEQ.nextval,#{category} ,#{id}, #{title}, #{content}, sysdate, 0, 0)
+	</insert>
+		
+	<update id="updFree" parameterType="FreeBoard">
+		update freeboard
+		set 
+			title = #{title}, content = #{content}
+		where 
+			freeboard_no =#{freeboardNo};
+	</update>
+	<select id="getFreeCategoryList" resultType="Common">
+		SELECT * FROM comm WHERE BCD=200
+	</select>
+	<select id="findReplyForBoard" parameterType="Long" resultType="FreeReply">
+		SELECT * FROM freeboardreply f, member m WHERE f.freeboard_no = #{freeboardNo} AND f.id = m.id 
+	</select>
+	<insert id="insertFreeboardImg" parameterType="Image" >
+		INSERT INTO image VALUES(#{tableType}, #{cusNo}, IMAGE_SEQ.nextval, #{imgPath}, #{imgClass})
+	</insert>
+	<delete id="deleteFreeboardContent" parameterType="Long">
+		DELETE freeboard WHERE freeboard_no = #{freeboardNo}
+	</delete>
+	<update id="freeboardPostCntInc" parameterType="Long">
+		UPDATE freeboard SET view_count = view_count+1 WHERE freeboard_no = #{freeboardNo}
+	</update>
+	<select id="getRecommandLog" parameterType="RecommandLog" resultType="RecommandLog">
+		SELECT * FROM recommandlog WHERE freeboard_no=#{freeboardNo} AND id=#{id}
+	</select>
+	<insert id="createRecommandLog" parameterType="RecommandLog">
+		INSERT INTO recommandlog VALUES(#{id}, #{freeboardNo}, 0)
+	</insert>
+	<update id="postRecommand" parameterType="RecommandLog">
+		UPDATE freeboard SET recommand = recommand+#{recommandLog} WHERE freeboard_no=#{freeboardNo}
+	</update> 
+	<update id="actRecommand" parameterType="RecommandLog">
+		UPDATE recommandlog SET recommand_log = recommand_log+#{recommandLog} WHERE freeboard_no=#{freeboardNo} AND id=#{id}
+	</update>
+	<select id="selectImgs" parameterType="Long" resultType="Image">
+		SELECT * FROM image WHERE cus_no = #{freeboardNo} ORDER BY img_class DESC
+	</select>
+	<delete id="deleteImgs" parameterType="Long">
+		DELETE image WHERE cus_no = #{freeboardNo}
+	</delete>
+	<delete id="deleteRecommandLog" parameterType="Long">
+		DELETE recommandlog WHERE freeboard_no=#{freeboardNo}
+	</delete>
+	<select id="selSearchFreeTotal" resultType="int" parameterType="Page">
+		SELECT count(*) FROM freeboard b, member m WHERE 
+		<choose>
+			<when test='searchOption.equals("username")'>
+				m.username LIKE '%'||#{searchString}||'%'
+			</when>
+			<when test='searchOption.equals("category")'>
+				b.category LIKE '%'||#{searchString}||'%'
+			</when>
+			<when test='searchOption.equals("title")'>
+				b.title LIKE '%'||#{searchString}||'%'
+			</when>
+			<when test='searchOption.equals("content")'>
+				b.content LIKE '%'||#{searchString}||'%'
+			</when>
+			<when test='searchOption.equals("regdate")'>
+				b.regDate LIKE '%'||#{searchString}||'%'
+			</when>
+			<otherwise>
+				(b.regDate LIKE '%'||#{searchString}||'%' OR 
+				b.content LIKE '%'||#{searchString}||'%' OR
+				b.title LIKE '%'||#{searchString}||'%' OR
+				m.username LIKE '%'||#{searchString}||'%')
+			</otherwise>
+		</choose>
+		AND b.id= m.id
+	</select>
+	<select id="getSearchFreeList" resultType="FreeBoard" parameterType="Page">
+		SELECT * 
+		FROM (
+			SELECT rownum rn, a.* 
+			FROM (
+				SELECT f.* 
+				FROM freeboard f, member m
+				WHERE
+				<choose>
+					<when test='searchOption.equals("username")'>
+						m.username LIKE '%'||#{searchString}||'%'
+					</when>
+					<when test='searchOption.equals("category")'>
+						f.category LIKE '%'||#{searchString}||'%'
+					</when>
+					<when test='searchOption.equals("title")'>
+						f.title LIKE '%'||#{searchString}||'%'
+					</when>
+					<when test='searchOption.equals("content")'>
+						f.content LIKE '%'||#{searchString}||'%'
+					</when>
+					<when test='searchOption.equals("regdate")'>
+						f.regDate LIKE '%'||#{searchString}||'%'
+					</when>
+					<otherwise>
+						(f.regDate LIKE '%'||#{searchString}||'%' OR 
+						f.content LIKE '%'||#{searchString}||'%' OR
+						f.title LIKE '%'||#{searchString}||'%' OR
+						m.username LIKE '%'||#{searchString}||'%')
+					</otherwise>
+				</choose>
+				AND m.id=f.id
+				ORDER BY f.freeboard_no desc) a ) b, 
+			member m 
+		WHERE 
+		b.id = m.id AND rn BETWEEN #{start} and #{end} 
+	</select> 
+	<update id="updateFreeboard" parameterType="Freeboard">
+		UPDATE freeboard SET title = #{title}, content = #{content}, category = #{category} WHERE freeboard_no = #{freeboardNo}
+	</update>
+	<delete id="deleteFreeboardImages" parameterType="String">
+		DELETE image WHERE img_path=#{imgPath}
+	</delete>
+	<select id="prevPost" parameterType="Long" resultType="String">
+		<![CDATA[SELECT MAX(freeboard_no) FROM freeboard WHERE freeboard_no<#{freeboardNo}]]>
+	</select>
+	<select id="nextPost" parameterType="Long" resultType="String">
+		<![CDATA[SELECT MIN(freeboard_no) FROM freeboard WHERE freeboard_no>#{freeboardNo}]]>
+	</select>
+	<select id="freeBoardLatestNotices" resultType="Freeboard">
+		SELECT sdf.*, ROWNUM rn
+		FROM (	SELECT ROWNUM rn, f.*, m.member_name, m.username, m.role
+				FROM freeboard f , member m
+				WHERE f.category='게시판공지' 
+				AND f.id=m.id 
+				ORDER BY freeboard_no DESC) sdf
+		<![CDATA[WHERE ROWNUM<3]]>
+	</select>
+</mapper>

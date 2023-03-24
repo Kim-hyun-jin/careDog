@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.ljw.Member">
+	<insert id="insertMember" parameterType="Member">
+		INSERT INTO MEMBER
+			(id, username, role, password, member_call, member_name,member_address, member_email, member_enabled, teacher)
+
+		VALUES(member_seq.nextval, #{username}, 'ROLE_MEMBER', #{password}, #{memberCall}, #{memberName},#{memberAddress}, #{memberEmail}, 1,7)
+
+	</insert>
+	<select id="selectMemberByUsername" parameterType="String" resultType="Member">
+		SELECT * FROM MEMBER
+		WHERE username=#{username}
+	</select>
+	<select id="checkPremium" parameterType="Long" resultType="int">
+		SELECT COUNT(join_check) FROM dog WHERE id=#{id} AND join_check=1
+	</select>
+	<select id="findJoinData" parameterType="Member" resultType="Member">
+		SELECT * FROM member WHERE member_name=#{memberName} AND member_email=#{memberEmail}
+	</select>
+	<select id="checkEmail" parameterType="Member" resultType="Member">
+		SELECT * FROM member WHERE username=#{username} AND member_email=#{memberEmail}
+	</select>
+	<update id="mailKeySet" parameterType="Member">
+		UPDATE member SET mail_key=#{mailKey} WHERE username=#{username}
+	</update>
+	<select id="mailKeyChk" parameterType="Member" resultType="Member">
+		SELECT * FROM member WHERE mail_key=#{mailKey} AND username=#{username}
+	</select>
+	<update id="passwordReset" parameterType="Member">
+		UPDATE member SET password=#{password}, mail_key=null WHERE username=#{username}
+	</update>
+</mapper>

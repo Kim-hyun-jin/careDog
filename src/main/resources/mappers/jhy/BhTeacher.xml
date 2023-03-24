@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.jhy.BHTeacher">
+	<select id="bhAllList" parameterType="BH" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, mt.member_name tname, bh.status
+		FROM bh_correction bh, member m, member mt
+		WHERE bh.member_id = m.id
+		AND bh.teacher_id = mt.id(+)
+	</select>
+
+	<select id="selBhTeacherList" parameterType="BH" resultType="BH">
+		SELECT * FROM
+		       (select 
+		          rownum as trn, tot.*
+		       from
+		       (   select rownum as rn, sub.*
+		         from 
+		           (   SELECT bh.appli_no, bh.title, m.member_name, mt.member_name tname, bh.status
+						FROM bh_correction bh, member m, member mt
+						WHERE bh.member_id = m.id
+						AND bh.teacher_id = mt.id(+)
+						ORDER BY appli_no asc ) sub
+						       order by rn desc)  tot )
+						       where trn between #{start} and #{end}
+	</select>
+	
+	<!-- BhAllSelect -->
+	<select id="selBh" parameterType="Long" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, m.member_call, mt.member_name tname, bh.start_date, bh.finish_date, d.dog_name, bh.before_content, bh.after_content, bh.status 
+		FROM bh_correction bh, member m, member mt, dog d
+		WHERE bh.member_id = m.id
+		AND bh.dog_no = d.dog_no
+		AND bh.teacher_id = mt.id(+)
+		AND bh.appli_no = #{appliNo}
+	</select>
+	
+	<!-- BhTeacherAdd -->
+	<!-- (221212 학원) -->
+	<select id="bhTeacherAddMemberId" parameterType="Long" resultType="BH">
+		SELECT member_name
+		FROM member
+		WHERE id = #{memberId}
+	</select>
+	<!-- (221212 학원) -->
+	<select id="bhTeacherAddSelect" parameterType="BH" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, m.member_call, mt.member_name tname, bh.start_date, bh.finish_date, d.dog_name, bh.before_content, bh.after_content, bh.status 
+		FROM bh_correction bh, member m, member mt, dog d
+		WHERE bh.member_id = m.id
+		AND bh.dog_no = d.dog_no
+		AND bh.teacher_id = mt.id(+)
+		AND bh.appli_no = #{appliNo}
+	</select>
+	<!-- (221212 학원) -->
+	<update id="bhTeacherAddConfirm" parameterType="BH">
+		UPDATE bh_correction
+		SET
+		status = '훈련 확정',
+		teacher_id = #{memberId},
+		start_date = #{startDate},
+		finish_date = #{finishDate},
+		after_content = #{afterContent}
+		WHERE appli_no = #{appliNo}
+	</update>
+	
+	<!-- (221212 학원) -->
+ 	<select id="bhTeacherUpdateSelect" parameterType="Long" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, m.member_call, mt.member_name tname, bh.start_date, bh.finish_date, d.dog_name, bh.before_content, bh.after_content, bh.status 
+		FROM bh_correction bh, member m, member mt, dog d
+		WHERE bh.member_id = m.id
+		AND bh.dog_no = d.dog_no
+		AND bh.teacher_id = mt.id(+)
+		AND bh.appli_no = #{appliNo}
+	</select> 
+		
+		<!-- //(221212 학원) -->
+	<!-- BhTeacherUpdate -->
+	<update id="bhTeacherUpdate" parameterType="BH">
+		UPDATE bh_correction
+		SET
+		start_date = #{startDate},
+		finish_date = #{finishDate},
+		after_content = #{afterContent}
+		WHERE appli_no = #{appliNo}
+	</update>
+	
+	<!-- bhTeacherDelete -->
+	<update id="bhTeacherDelete" parameterType="BH">
+		UPDATE bh_correction
+		SET
+        status = '미정',
+        teacher_id = NULL,
+		start_date = NULL,
+		finish_date = NULL,
+		after_content = NULL
+		WHERE appli_no = #{appliNo}
+	</update>
+	
+	<!-- bhTeacherList -->
+	<select id="bhTeacherList" parameterType="BH" resultType="BH">
+		SELECT * FROM
+		       (select 
+		          rownum as trn, tot.*
+		       from
+		       (   select rownum as rn, sub.*
+		         from 
+		           (SELECT bh.appli_no, bh.title, m.member_name, mt.member_name tname, bh.start_date, bh.finish_date
+						FROM bh_correction bh, member m, member mt
+						WHERE bh.member_id = m.id
+						AND bh.teacher_id = mt.id
+						AND bh.teacher_id = #{memberId} 
+						ORDER BY appli_no asc ) sub
+						       order by rn desc)  tot )
+						       where trn between #{start} and #{end}
+	</select>
+	
+	<!-- paging -->
+	<select id="hyBhAllListTotalCount" parameterType="Long" resultType="int">
+		SELECT count(*)
+			FROM bh_correction bh, member m, member mt
+			WHERE bh.member_id = m.id
+			AND bh.teacher_id = mt.id(+)
+	</select>
+	
+	<!-- bhTeacherList Paging -->
+	<select id="bhTeacherListTotalCount" parameterType="Long" resultType="int">
+		SELECT count(*)
+		FROM bh_correction bh, member m, member mt
+		WHERE bh.member_id = m.id
+		AND bh.teacher_id = mt.id
+		AND bh.teacher_id = #{memberId}
+	</select>
+</mapper>
+

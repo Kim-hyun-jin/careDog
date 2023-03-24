@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.ShRes">
+	<select id="shResTotal" resultType="int">
+		SELECT COUNT(*) FROM reservation	
+	</select>
+	
+	<select id="shResMemberTotal" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM reservation
+		WHERE id = #{id}
+	</select>
+	
+	<select id="shResPayTotal" resultType="int">
+		SELECT COUNT(*) FROM res_pay
+	</select>
+	
+	<select id="shResSearchTotal" resultType="int" parameterType="String">
+		SELECT COUNT(*)
+		FROM reservation r, member m
+		WHERE (m.member_name LIKE '%' || #{name} || '%' OR r.dog_name LIKE '%' || #{name} || '%')
+		AND r.id = m.id
+	</select>
+
+	<select id="shRoomChoice"  parameterType="int" resultType="Hotel" >
+		SELECT h.room_num, h.room_type, h.room_ment, h.room_condition, r.room_price, r.room_function, r.limit_size
+		FROM hotel h, room r
+		WHERE room_num = #{roomNum}
+		AND h.room_type = r.room_type
+	</select>
+	
+	<select id="shResList" parameterType="Reservation" resultType="Reservation" >
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT r.res_no, r.room_num, TO_CHAR(r.res_startdate, 'yy-mm-dd') res_startdate, TO_CHAR(r.res_enddate, 'yy-mm-dd') res_enddate, r.id, r.dog_name, r.dog_size, r.de_sexing, m.member_name, m.member_call, m.member_address, rp.res_price, rp.order_status
+				 FROM reservation r, member m, res_pay rp
+				 WHERE r.id = m.id
+				 AND r.res_no = rp.res_no
+				 ORDER BY res_no) a
+		)
+ 		WHERE rn BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="shResListSearch" parameterType="com.oracle.s20221103.dto.MapperVO" resultType="Reservation" >
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT r.res_no, r.room_num, TO_CHAR(r.res_startdate, 'yy-mm-dd') res_startdate, TO_CHAR(r.res_enddate, 'yy-mm-dd') res_enddate, r.id, r.dog_name, r.dog_size, r.de_sexing, m.member_name, m.member_call, m.member_address, rp.res_price, rp.order_status
+				 FROM reservation r, member m, res_pay rp
+				 WHERE r.id = m.id
+				 AND r.res_no = rp.res_no
+				 AND (m.member_name LIKE '%' || #{name} || '%' OR r.dog_name LIKE '%' || #{name} || '%')
+				 ORDER BY res_no) a
+		)
+ 		WHERE rn BETWEEN #{reservationDTO.start} and #{reservationDTO.end}
+	</select>
+	
+	<select id="shResMemberList" resultType="Reservation" parameterType="com.oracle.s20221103.dto.MapperVO">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT r.res_no, r.room_num, TO_CHAR(r.res_startdate, 'yy-mm-dd') res_startdate, TO_CHAR(r.res_enddate, 'yy-mm-dd') res_enddate, r.id, r.dog_name, r.dog_size, r.de_sexing, m.member_name, m.member_call, m.member_address, rp.res_price, rp.order_status, h.room_type
+				 FROM reservation r, member m, res_pay rp, hotel h
+				 WHERE r.id = #{id}
+				 AND r.id = m.id
+				 AND r.res_no = rp.res_no
+				 AND r.room_num = h.room_num
+			 	 AND rp.order_date BETWEEN TRUNC(ADD_MONTHS (SYSDATE, -3)) AND SYSDATE
+				 ORDER BY res_startdate DESC) a
+		)
+ 		WHERE rn BETWEEN #{reservationDTO.start} and #{reservationDTO.end}
+	</select>
+	
+	<select id="shResMemberListSearch" resultType="Reservation" parameterType="com.oracle.s20221103.dto.MapperVO">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT r.res_no, r.room_num, TO_CHAR(r.res_startdate, 'yy-mm-dd') res_startdate, TO_CHAR(r.res_enddate, 'yy-mm-dd') res_enddate, r.id, r.dog_name, r.dog_size, r.de_sexing, m.member_name, m.member_call, m.member_address, rp.res_price, rp.order_status, h.room_type
+				 FROM reservation r, member m, res_pay rp, hotel h
+				 WHERE r.id = #{id}
+				 AND r.id = m.id
+				 AND r.res_no = rp.res_no
+				 AND r.room_num = h.room_num
+		 		<if test="period == 'three'">
+		 			AND rp.order_date BETWEEN TRUNC(ADD_MONTHS (SYSDATE, -3)) AND SYSDATE
+		 		</if>
+		 		<if test="period == 'half'">
+		 			AND rp.order_date BETWEEN TRUNC(ADD_MONTHS (SYSDATE, -6)) AND SYSDATE
+		 		</if>
+		 		<if test="period == 'year'">
+		 			AND rp.order_date BETWEEN TRUNC(ADD_MONTHS (SYSDATE, -12)) AND SYSDATE
+		 		</if>
+				 ORDER BY res_startdate DESC) a
+		)
+ 		WHERE rn BETWEEN #{reservationDTO.start} and #{reservationDTO.end}
+	</select>
+	
+	<select id="shResPayList" parameterType="com.oracle.s20221103.dto.ResPayDTO" resultType="com.oracle.s20221103.dto.ResPayDTO">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT res.res_no, res.id, mem.member_name, mem.member_call, rsp.res_price, rsp.order_date, rsp.order_status
+				 FROM 
+				 	 res_pay rsp,
+    			 	 reservation res,
+    			 	 member mem
+				 WHERE res.id=mem.id
+				 AND rsp.RES_NO=res.RES_NO
+				 ORDER BY res.res_no) a
+		)
+ 		WHERE rn BETWEEN #{start} and #{end}
+	</select>
+	
+	<insert id="shResInsert" parameterType="com.oracle.s20221103.dto.ResVO">
+		INSERT INTO reservation
+		VALUES (RESERVATION_SEQ.nextval
+        		,#{roomNum}
+       		 	,TO_DATE(#{resStartdate},'RR/MM/DD')
+        		,TO_DATE(#{resEnddate},'RR/MM/DD')
+        		,#{id}
+        		,#{dogName}
+        		,#{dogSize}
+        		,#{deSexing})
+	</insert>
+	
+	<insert id="shResPayInsert" parameterType="com.oracle.s20221103.dto.ResVO">
+		INSERT INTO res_pay
+			( res_no
+			, res_price
+			, order_date
+			, order_status)
+		VALUES (RESERVATION_SEQ.currval
+        		,#{resPrice}
+        		,SYSDATE
+        		,'결제완료')
+	</insert>
+	
+	<select id="shResNumSel" resultType="Long">
+		SELECT RESERVATION_SEQ.currval FROM dual
+	</select>
+	
+	<update id="shResPayUpdate" parameterType="Long">
+		UPDATE res_pay
+		SET order_status = '결제취소'
+		WHERE res_no = #{resNo}
+	</update>
+</mapper>

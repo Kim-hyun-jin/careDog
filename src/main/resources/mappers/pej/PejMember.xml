@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.MemberDogMapper">
+	<select id="selMemberList" resultType="MemberDog">
+		SELECT DISTINCT *
+		FROM member
+	</select>
+	
+	<select id="detailMemberDog" parameterType="Long" resultType="MemberDog">	
+		SELECT m.*, d.*
+		FROM member m, dog d
+		WHERE m.id = d.id 
+		AND m.id = #{id}
+	</select>
+	
+	<!-- 한주_관리자_회원정보 관리에서 선생님 ID->이름으로 불러오기 위해 수정했음 -->
+	<select id="detailMemberDog1" parameterType="Long" resultType="MemberDog">
+		SELECT m.* , t.member_name teacher_name
+		FROM member m, member t
+		WHERE m.id = #{id}
+		and m.teacher=t.id
+	</select>
+	
+ 	<select id="selRole" resultType="MemberDog">
+		SELECT *
+		FROM comm
+		WHERE bcd = 999
+		<![CDATA[AND mcd <> 999]]> 
+	</select>
+	
+	<update id="updateMemberDog" parameterType="MemberDog">
+		UPDATE member
+		SET role=#{role}
+		WHERE id=#{id}
+	</update>
+	
+	<select id="selMyInfo" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id=#{id}
+	</select>
+	
+	<update id="updateMyinfo" parameterType="MemberDog">
+		UPDATE member 
+      	SET MEMBER_NAME=#{memberName},
+	   		MEMBER_CALL=#{memberCall}, 
+	   		MEMBER_EMAIL=#{memberEmail}, 
+	  		MEMBER_ADDRESS=#{memberAddress}
+     	WHERE id = #{id}
+	</update>
+	
+	<select id="updateFormMyInfo" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member
+		WHERE id = #{id}
+	</select>
+	
+	<select id="selMyInfo1" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+	
+	<select id="myPwEdit" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+
+
+
+
+	<update id="updateMyPw" parameterType="MemberDog">
+		UPDATE member 
+      	SET PASSWORD=#{password}
+     	WHERE id = #{id}
+	</update>
+	
+	<select id="myPwEditAfter" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+	
+	<select id="myInfoDrop" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+
+	<update id="myInfoDropAfter" parameterType="MemberDog">
+		UPDATE member 
+      	SET MEMBER_ENABLED=0
+     	WHERE id = #{id}
+	</update>
+	
+	<select id="selMyEmail" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+	
+	<update id="updateDogInfo" parameterType="MemberDog">
+		UPDATE dog
+		SET SC_STARTDATE=#{scStartdate}
+		WHERE DOG_NO=#{dogNo}
+	</update>
+	
+	<update id="updateDogInfo2" parameterType="MemberDog">
+		UPDATE dog
+		SET SC_ENDDATE=#{scEnddate},
+			JOIN_CHECK=1
+		WHERE DOG_NO=#{dogNo}
+	</update>
+	
+	<select id="detailDogInfo" parameterType="Long" resultType="MemberDog">
+		SELECT * 
+		FROM dog 
+		WHERE DOG_NO = #{dogNo}
+	</select>
+	
+</mapper>

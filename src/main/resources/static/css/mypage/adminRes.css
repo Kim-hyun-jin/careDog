@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+.form-control {
+	width: 200px;
+	float: left;
+	margin-right: 10px;
+}
+
+.frm {
+	margin: 20px 0px;
+}

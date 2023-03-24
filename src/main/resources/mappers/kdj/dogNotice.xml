@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.DogNoticeMapper">
+
+<!-- 		<select id="djDogListAll"  resultType="dogNotice" parameterType="dogNotice">
+ 	select rownum, tot.*
+           from(
+				 SELECT d.dog_name, m.member_name, mt.member_name tname, dn.notice_no, dn.title, dn.regdate
+     	 		 FROM  dog_notice dn , member m , member mt , dog d
+     			 WHERE dn.id = m.id
+				 And  dn.id=#{id}
+				 AND  dn.teacher_id = mt.id(+)
+			     AND  dn.dog_no = d.dog_no
+			     ORDER BY dn.notice_no ASC)tot
+	 ORDER BY rownum DESC
+	 </select> -->
+	 
+	 <select id="djDogListAll"  resultType="dogNotice" parameterType="dogNotice">
+	
+	 select  *from
+		(select rownum as trn, tot.*
+          from
+	        (select rownum rn , sub.*
+           from(
+		SELECT d.dog_name, m.member_name, mt.member_name tname, dn.notice_no, dn.title, dn.regdate
+		FROM  dog_notice dn , member m , member mt , dog d
+		WHERE dn.id = m.id
+		And  dn.id=#{id}
+		AND  dn.teacher_id = mt.id(+)
+		AND  dn.dog_no = d.dog_no
+	            ORDER BY dn.notice_no ASC )sub
+  		ORDER BY rn DESC)tot)
+    
+    where trn BETWEEN #{start} and #{end}
+    
+ 
+		</select>
+	   <select id="djContSelOne"  parameterType="Long" resultType="dogNotice" >
+	SELECT 
+			d.dog_name, m.member_name, mt.member_name tname,
+			dn.notice_no, dn.title, dn.regdate, dn.feel, dn.condition,
+			dn.meal, dn.health, dn.content , dn.DOG_IMGNAME, dn.DOG_IMGPATH
+	FROM 
+			dog_notice dn , member m , member mt , dog d
+	WHERE 
+		 dn.id = m.id
+		And dn.notice_no=#{noticeNo}
+		AND dn.teacher_id = mt.id(+)
+		AND dn.dog_no = d.dog_no
+
+   	 </select> 
+   	 
+   	 <!-- 알림장 수정 -->
+   	<select id="djModOne"  parameterType="Long" resultType="dogNotice" >
+	SELECT 
+			d.dog_name, m.member_name, mt.member_name tname, m.id, m.username,
+			dn.notice_no, dn.title, dn.regdate, dn.feel, dn.condition,
+			dn.meal, dn.health, dn.content, dn.DOG_IMGNAME, dn.DOG_IMGPATH
+	FROM 
+			dog_notice dn , member m , member mt , dog d
+	WHERE 
+		 	dn.id = m.id
+		And dn.notice_no=#{noticeNo}
+		AND dn.teacher_id = mt.id
+		AND dn.dog_no = d.dog_no
+    </select>  
+   	 
+   	 <!-- 알림장 수정 -->
+	<update id="djModContent" parameterType="dogNotice" >
+	UPDATE 
+			dog_notice 
+	SET  
+		 title=#{title},
+		 content=#{content}, 
+		 feel=#{feel},
+		 health=#{health}, 
+		 meal=#{meal}, 
+		 condition=#{condition},
+		 DOG_IMGNAME=#{dogImgName},
+		 DOG_IMGPATH=#{dogImgPath}  
+		    
+   	WHERE notice_no=#{noticeNo}			
+	
+	</update> 
+	
+		<!--알림장글쓰기페이지, 강아지목록 가져오기-->
+     <select id="djInsWrite" resultType="dog" parameterType="Long">
+	   	SELECT   
+	   		 dog_no, dog_name , id  
+        FROM    
+        	 dog
+        WHERE
+        	id=#{id}
+	</select>
+	
+	<!--알림장 Insert  -->
+	<insert id="djInsertNotice" parameterType="dogNotice">
+		insert 
+			into dog_notice
+					(
+						id, 
+						notice_no, 
+						title, 
+						dog_no, 
+						content,
+						 feel, 
+						 health, 
+						 meal, 
+						 condition,
+						 teacher_id,
+						 regdate, 
+						 DOG_IMGNAME,
+						 DOG_IMGPATH 
+					 ) 	
+		values
+					(
+					#{id},
+					 Dog_Notice_SEQ.nextval, 
+					 #{title}, 
+					 #{dogNo},
+					 #{content} ,
+					 #{feel},
+					 #{health} ,
+					 #{meal} ,
+					 #{condition},
+					 #{teacherId},
+					 #{regdate},
+					 #{dogImgName ,jdbcType=VARCHAR},
+				     #{dogImgPath ,jdbcType=VARCHAR} 
+				     )
+	
+	</insert>
+	
+<!-- 	알림장 삭제 -->
+	<delete id="djDelDogNotice" parameterType="Long" >
+	delete 
+		FROM 	
+			dog_notice
+		WHERE
+			notice_no=#{noticeNo}
+	
+	</delete>
+	
+	<select id="djTinsWrite" parameterType="Long" resultType="Dog">
+		
+		SELECT
+				 *
+		FROM
+				dog d, member m
+		WHERE
+				 m.teacher=#{id}
+		AND 
+				m.id=d.id 
+	
+
+	</select>
+	
+	<select id="djMeminsWrite" parameterType="Long" resultType="Member">
+		select
+		    m.id, m.teacher, m2.member_name tname
+		FROM
+		   member m
+		   left outer join member m2
+		   on m.teacher = m2.id
+		where m.id = #{id}
+
+	</select>
+	
+	<!-- 선생님 List 보기 -->
+	<select id="djTeacherList" parameterType="dogNotice" resultType="dogNotice">
+ 
+		SELECT * FROM
+		       (select 
+		          rownum as trn, tot.*
+		       from
+		       (   select rownum as rn, sub.*
+		         from 
+		           (   select d.dog_name, m.member_name, mt.member_name tname, dn.notice_no, dn.title, dn.regdate
+		               from dog_notice dn, member m, member mt, dog d
+		               where dn.teacher_id = #{teacherId}
+		               and dn.teacher_id = mt.id
+		               and  dn.id = m.id(+)
+		               and  dn.dog_no = d.dog_no
+		               order by dn.notice_no ASC ) sub
+		       order by rn desc)  tot )
+		       where trn between #{start} and #{end}
+                   
+	</select>
+	
+	<!--선생님알림장 Insert  -->
+ 	<insert id="djTeacherInsertNotice" parameterType="dogNotice">
+		insert 
+			into dog_notice
+					(
+						id, 
+						notice_no, 
+						title, 
+						dog_no, 
+						content,
+						 feel, 
+						 health, 
+						 meal, 
+						 condition,
+				         teacher_id, 
+						 regdate, 
+						 DOG_IMGNAME,
+						 DOG_IMGPATH 
+					 ) 	
+		values
+					(
+					#{id},
+					 Dog_Notice_SEQ.nextval, 
+					 #{title}, 
+					 #{dogNo},
+					 #{content} ,
+					 #{feel},
+					 #{health} ,
+					 #{meal} ,
+					 #{condition},
+			         #{teacherId}, 
+					 #{regdate},
+					 #{dogImgName ,jdbcType=VARCHAR},
+				     #{dogImgPath ,jdbcType=VARCHAR} 
+				     )
+	
+	</insert>
+	
+		<select id="getCategoryList" resultType="Common">
+		SELECT * FROM comm WHERE BCD=104
+	   </select>
+	   
+	   <!--강아지번호로 주인 아이디 불러오기  -->
+	   <select id="djgetDogInfoId" parameterType="Long" resultType="Dog">
+	   
+	   select * from dog where dog_no=#{dogNo}
+	   
+	   </select>
+	   <!-- 전체카운트 -->
+	   <select id="djTotalCount" resultType="int">
+	   	 	select Count(*) from dog_notice where id=#{id}
+	   
+	   </select>
+	   <!-- 선생님 카운트 -->
+	   <select id="djTeacherTotalCnt" resultType="int">
+	   
+	   select Count(*) from dog_notice where teacher_id=#{teacherId}
+	   
+	   </select>
+	   
+   <select id="djTNameinsWrite" parameterType="Long" resultType="Member">
+		select
+		    m.id, m.teacher, m2.member_name
+		FROM
+		   member m
+		   left outer join member m2
+		   on m.teacher = m2.id
+		where 
+		      m.id = #{id}
+
+	</select> 
+	   
+	   
+
+</mapper>
