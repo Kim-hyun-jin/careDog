@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.jhy.BHMember">
+	<!-- 행동교정 신청 목록(사용자) -->
+	<select id="bhList" parameterType="BH" resultType="BH" >
+		 select  *from (
+		 
+		 	select rownum as trn, tot.*
+		 	from (
+		 		select rownum as rn , sub.*
+		 		from (
+					SELECT bh.appli_no, bh.title,  bh.member_id, m.member_name, bh.teacher_id, mt.member_name tname, bh.status
+					FROM bh_correction bh, member m , member mt
+					WHERE bh.member_id = m.id
+					AND	bh.member_id = #{memberId}
+			 		AND  bh.teacher_id = mt.id(+)
+			 		ORDER BY bh.appli_no asc)sub
+			  		ORDER BY rn DESC)tot)
+			        where trn BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="meList" parameterType="Long" resultType="Member">
+		SELECT * FROM member WHERE id = #{memberId}
+	</select>
+	
+	<select id="dogList" parameterType="Long" resultType="Dog">
+		SELECT * FROM dog WHERE id = #{memberId}
+	</select>
+	
+	<insert id="insBhList" parameterType="BH">
+		INSERT INTO bh_correction(appli_no, member_id, dog_no, title, before_content, status)
+		VALUES(BH_CORRECTION_SEQ.nextval, #{memberId}, #{dogNo}, #{title}, #{beforeContent}, '미정')
+	</insert>
+	
+	<select id="selBhList" parameterType="Long" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, m.member_call, mt.member_name tname, bh.start_date, bh.finish_date, d.dog_name, bh.before_content, bh.after_content, bh.status 
+		FROM bh_correction bh, member m, member mt, dog d
+		WHERE bh.member_id = m.id
+		AND bh.dog_no = d.dog_no
+		AND bh.teacher_id = mt.id(+)
+		AND bh.appli_no = #{appliNo}
+	</select>
+	
+	<!-- 행동교정 신청 수정(사용자) - select -->
+	<select id ="befUpList" parameterType="Long" resultType="BH">
+		SELECT bh.appli_no, bh.title, m.member_name, m.member_call, bh.dog_no, d.dog_name, bh.before_content
+		FROM bh_correction bh, member m, dog d
+		WHERE bh.member_id= m.id
+		AND bh.dog_no = d.dog_no
+		AND bh.appli_no = #{appliNo}
+	</select>
+	
+	<update id="upBhList" parameterType="BH">
+		UPDATE bh_correction
+		SET title = #{title, jdbcType=VARCHAR},
+			dog_no = #{dogNo},
+			before_content = #{beforeContent, jdbcType=VARCHAR}
+		WHERE appli_no = #{appliNo}
+	</update>
+
+	<delete id="bhDel" parameterType="Long">
+		DELETE FROM bh_correction WHERE appli_no = #{appliNo}
+	</delete>
+	
+	<select id="delSelBh" parameterType="Long" resultType="BH">
+		SELECT * FROM bh_correction WHERE appli_no = #{appliNo}
+	</select>
+	
+	<!-- paging -->
+	<select id="hyBHMainTotalCount" parameterType="Long" resultType="int">
+		SELECT count(*)
+		FROM bh_correction bh, member m , member mt
+		WHERE bh.member_id = m.id
+		AND	bh.member_id = #{memberId}
+ 		AND  bh.teacher_id = mt.id(+)
+	</select>
+</mapper>

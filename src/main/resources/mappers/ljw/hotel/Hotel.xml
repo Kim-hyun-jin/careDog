@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.ljw.Hotel">
+	<select id="roomList" resultType="Room">
+		SELECT * FROM room
+	</select>
+	<select id="resRoomList" resultType="Hotel" parameterType="java.util.HashMap">
+		SELECT *
+		FROM hotel h , room r
+		WHERE h.room_num NOT IN (SELECT room_num FROM reservation, res_pay rp
+		WHERE reservation.res_no = rp.res_no AND rp.order_status ='결제완료' AND  
+			((res_startdate BETWEEN #{resStartdate} AND #{resEnddate})
+			OR (res_enddate BETWEEN #{resStartdate} AND #{resEnddate})
+			<![CDATA[OR (res_startdate <= #{resStartdate} AND res_enddate >=#{resEnddate})))]]>
+		AND r.room_type = h.room_type
+		ORDER BY room_num
+	</select>
+</mapper>

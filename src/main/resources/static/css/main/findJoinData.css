@@ -1,0 +1,56 @@
+@charset "UTF-8";
+h1, h5{
+	display: inline;
+}
+a {
+	color:black;
+}
+.pageDocument{
+	font-size: small;
+}
+.mainContents{
+	display: flex;
+	justify-content: center;
+	background-image: linear-gradient(rgba(255, 255, 255, 0.9),rgba(255, 255, 255, 0.9)), url("/img/freeboard/puppy.jpg");
+	align-items:flex-start;
+	min-height:100%;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+.container{
+	display: block;
+	height: auto;
+	background-color:white;
+	margin: 0px;
+}
+.sidebar{
+	display: inline-block;
+	float : left;
+	width: 10%;
+}
+.categoryLink{
+	font-weight: bold;
+	color: #999999;
+	text-align: center;
+}
+.categorySelect {
+	float: left;
+}
+.keywordSearch{
+	float: right;
+}
+a {
+	text-decoration-line:none;
+}
+.navbar navbar-light bg-light justify-content-end {
+	background-color: red;
+}
+#detaildiv{
+}
+.LMRposition{
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-content: center;
+	align-items: flex-start;
+}

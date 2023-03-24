@@ -1,0 +1,81 @@
+@charset "UTF-8";
+.AdminIcon{
+	width: 25px;
+}
+.adminTr{
+	font-weight: bold;
+}
+.detailBtns{
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+.freeboardContentView img {
+	max-width: 100%;
+}
+.postDetailModButton{
+	color: brown;
+	font-size: small;
+}
+#replyContent{
+	width: 100%;
+	min-width: 200px;
+	min-height:100px;
+	overflow: visible;
+}
+@import url('https://fonts.googleapis.com/css?family=Amatic+SC');
+
+.button_container {
+	text-align: center;
+}
+
+.description, .link {
+  font-family: 'Amatic SC', cursive;
+  text-align: center;
+}
+
+.description {
+  font-size: 35px;
+}
+
+.btnAni01 {
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-shadow:-1px 0 #845E00, 0 1px #845E00, 1px 0 #845E00, 0 -1px #845E00;
+  outline: none;
+  overflow: hidden;
+  position: relative;
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  background-color: #222;
+  padding: 8px 30px;
+  margin: 0 auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.20);
+}
+
+.btnAni01 span {
+  position: relative; 
+  z-index: 1;
+}
+
+.btnAni01:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 490%;
+  width: 140%;
+  background: #FFC300;
+  -webkit-transition: all .5s ease-in-out;
+  transition: all .5s ease-in-out;
+  -webkit-transform: translateX(-98%) translateY(-25%) rotate(45deg);
+  transform: translateX(-98%) translateY(-25%) rotate(45deg);
+}
+
+.btnAni01:hover:after {
+  -webkit-transform: translateX(-9%) translateY(-25%) rotate(45deg);
+  transform: translateX(-9%) translateY(-25%) rotate(45deg);
+}

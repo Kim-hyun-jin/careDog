@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.DogMapper">
+	<!-- 나의 반려견 리스트 -->
+	<select id="hjMyDogList" parameterType="Dog" resultType="Dog">
+		SELECT dog_name,dog_no
+		FROM dog
+		<!-- WHERE id=1 -->
+		WHERE id=#{id} 
+	</select>
+	
+	<!-- 나의 반려견 정보 -->
+	<select id="hjMydogInfo" 	parameterType="Long" resultType="Dog">
+		SELECT * 
+		FROM  dog 
+		WHERE DOG_NO=#{dogNo} 
+	</select>
+	
+	<!-- 나의 반려견 정보 수정 -->
+	<update id="hjUpdMyDogInfo" parameterType="dog">
+	UPDATE dog 
+	SET  
+		 dog_name=#{dogName}, 
+		 dog_age=#{dogAge},
+		 dog_Weight=#{dogWeight}, 
+		 dog_Kind=#{dogKind}, 
+		 de_Sexibng=#{deSexibng},
+		 DOG_MEMO=#{dogMemo},
+		 DOG_IMGNAME=#{dogImgName ,jdbcType=VARCHAR},
+		 DOG_IMGPATH=#{dogImgPath ,jdbcType=VARCHAR}  
+   	WHERE dog_no=#{dogNo}			
+	
+	</update>
+	
+	<!-- 반려견 등록시, DOG_TYPE에 있는 DOG_KIND 가져오기  -->
+     <select id="hjdogTypeSelect" resultType="DogType">
+	   	SELECT   * 
+        FROM    dogType 
+	</select>
+	
+	<!-- 나의 반려견 등록  -->
+	<insert id="hjInsertDog" parameterType="dog">
+		insert into dog
+			    (id, 
+			    DOG_NO,   
+			    DOG_NAME,     
+			    DOG_GENDER, 
+			    DOG_AGE, 
+			    DOG_WEIGHT,
+			    DOG_MEMO, 
+			    DE_SEXIBNG,
+			    DOG_KIND,
+			    DOG_IMGNAME,
+			    DOG_IMGPATH,
+			    JOIN_CHECK
+			    )
+			    
+		values (#{id}, 
+		        DOG_SEQ.nextval, 
+		        #{dogName}, 	
+		        #{dogGender}, 
+		        #{dogAge}, 	
+		        #{dogWeight}, 	
+				#{dogMemo}, 	
+				#{deSexibng}, 
+				#{dogKind}, 
+				#{dogImgName ,jdbcType=VARCHAR},
+				#{dogImgPath ,jdbcType=VARCHAR},
+				#{joinCheck}
+								 )
+	</insert>
+	
+	<!-- 나의 반려견 정보 삭제  -->
+	<delete id="hjdelMyDogInfo" parameterType="long">
+		delete 
+		from dog 
+		WHERE dog_no=#{dogNo}	
+	</delete>
+	
+	<!-- 나의 반려견 정보 삭제시 알림장 정보 삭제  -->
+	<delete id="hjdelMyDogInfoNotice" parameterType="long">
+	
+		delete
+		from DOG_NOTICE
+		where dog_no=#{dogNo}
+	
+	</delete>
+	
+	<!-- 나의 반려견 정보 삭제시 행동교정 정보 삭제  -->
+	<delete id="hjdelMyDogInfoBh" parameterType="long">
+			delete
+			from BH_CORRECTION
+			where dog_no=#{dogNo}
+	</delete>
+	
+	<!-- 관리자_전체 호텔 예약리스트 -->
+	<select id="hjMemberResList" parameterType="Reservation" resultType="Reservation">
+		select *
+		from RESERVATION
+	</select>
+	
+	<!-- 관리자_예약번호별 상세내역 조회  -->
+	<select id="hjMemberResDetail" parameterType="Reservation"    resultType="Reservation">
+	SELECT 	*
+	FROM 
+			Reservation res,
+	        member mem,
+	        hotel ho,
+	        res_pay p 
+	WHERE 	
+			res.id=mem.id
+			and res.ROOM_NUM=ho.ROOM_NUM
+			and res.RES_NO=p.RES_NO
+			and res.RES_NO=#{resNo}
+	</select>
+	<!-- 관리자_호텔결제내역  -->
+	<select id="hjhotelPayList" parameterType="resPay" resultType="resPay">
+		select 
+				*
+		from 
+			res_pay rsp,
+	        reservation res,
+	        member mem
+		where 
+				res.id=mem.id
+		and    	rsp.RES_NO=res.RES_NO
+	</select>
+	<select id="hjTotalDogType" resultType="int">
+		select Count(*) FROM DOGTYPE
+	</select>
+	<!-- 	관리자_반려견 품종 리스트 조회 -->
+	<select id="hjdogTypeList" parameterType="DogType" resultType="DogType">
+	SELECT *
+		FROM
+		(
+		        SELECT rownum rn , a.*
+		        FROM
+		                   (select * from DogType order by DOG_KIND) a
+		 )   
+ 		WHERE  rn BETWEEN #{start} and #{end} 
+		
+	</select>
+	<!-- 관리자_반려견 품종 등록 -->
+	<insert id="hjInsertDogType" parameterType="DogType">
+		insert into dogtype 
+		values(#{dogKind},#{dogSize}, #{dogInfo})
+	</insert>
+	<!-- 관리자_반려견 품종 삭제  -->
+	<delete id="hjdelDogType" parameterType="String">
+		delete 
+		from DogType 
+		WHERE DOG_KIND=#{dogKind}	
+	</delete>
+	
+	
+	
+	
+	<select id="teacherSelect" resultType="Member">
+		select *
+		from member
+		where ROLE ='ROLE_TEACHER'
+	</select>
+	
+	<update id="updateTeacher" parameterType="Member">
+		update member
+		set TEACHER=#{teacher}
+		where id=#{id}
+	</update>
+	
+	<select id="memberTeacherup" parameterType="Long" resultType="Member">
+		select *
+		from member
+		where id=#{id}
+	</select>
+	
+</mapper>

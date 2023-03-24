@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.s20221103.ssh.QA">
+	<select id="shQATotal" resultType="int">
+		SELECT COUNT(q.id)
+		FROM QA q, member m
+		WHERE NOT m.role = 'ROLE_ADMIN'
+		AND m.id = q.id
+	</select>
+	
+	<select id="shQAAdminTotal" resultType="int">
+		SELECT COUNT(q.id)
+		FROM QA q, member m
+		WHERE m.role = 'ROLE_ADMIN'
+		AND m.id = q.id
+	</select>
+	
+	<select id="shQAMyTotal" resultType="int" parameterType="Long">
+		SELECT COUNT(*)
+		FROM QA
+		WHERE id = #{id}
+	</select>
+	
+	<select id="shQAAll" resultType="QA" parameterType="QA">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT q.*, m.member_name
+				 FROM qa q, member m
+				 WHERE q.id = m.id
+				 AND NOT m.role = 'ROLE_ADMIN') a
+		)
+ 		WHERE rn BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="shQAMy" resultType="QA" parameterType="QA">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT q.*, m.member_name
+				 FROM qa q, member m
+				 WHERE q.id = m.id
+				 AND m.id = #{id}) a
+		)
+ 		WHERE rn BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="shQAAdmin" resultType="QA" parameterType="QA">
+		SELECT *
+		FROM
+		(
+			SELECT rownum rn , a.*
+			FROM
+				(SELECT q.*, m.member_name
+				 FROM qa q, member m
+				 WHERE q.id = m.id
+				 AND m.role = 'ROLE_ADMIN') a
+		)
+ 		WHERE rn BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="shQAContent" resultType="QA" parameterType="Integer">
+		SELECT q.*, m.member_name, m.role
+		FROM qa q, member m
+		WHERE question_no = #{questionNo}
+		AND q.id = m.id
+	</select>
+	
+	<insert id="shQAInsert" parameterType="QA">
+		INSERT INTO qa
+			( question_no
+			, id
+			, title
+			, content
+			, status)
+		VALUES (QA_SEQ.nextval
+        		,#{id}
+        		,#{title}
+        		,#{content}
+        		,'답변 미완료')
+	</insert>
+	
+	<update id="shQAUpdate" parameterType="QA">
+		UPDATE qa
+		SET title = #{title},
+			content = #{content}
+		WHERE question_no = #{questionNo}
+	</update>
+	
+	<update id="shQAAdminUpdate" parameterType="QA">
+		UPDATE qa
+		SET admin_id = #{id},
+			answer_content = #{answerContent},
+			status = '답변 완료'
+		WHERE question_no = #{questionNo}
+	</update>
+	
+	<delete id="shQADelete" parameterType="QA">
+		DELETE FROM qa
+		WHERE question_no = #{questionNo}
+	</delete>
+</mapper>

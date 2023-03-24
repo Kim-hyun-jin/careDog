@@ -1,0 +1,35 @@
+@charset "UTF-8";
+	.mainContents{
+	display: flex;
+	justify-content: center;
+	background-image: linear-gradient(rgba(255, 255, 255, 0.9),rgba(255, 255, 255, 0.9)), url("/img/freeboard/puppy.jpg");
+	align-items:flex-start;
+	flex-basis:100%;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	}
+	.container{
+		display: block;
+		height: auto;
+		background-color:white;
+		margin: 0px;
+		width: 100%;
+	}
+	.boardContentDiv{
+    	padding: 16px 24px;
+        border: 1px solid #D6D6D6;
+        border-radius: 4px;
+        height: auto;
+        min-height: 600px;
+        overflow: hidden;
+	}
+	.boardContentDiv img {
+		max-width: 100%;
+	}
+	.freeboardXbutton {
+		width: 20px;
+	}
+	.freeboardImg{
+		max-width: 100%;
+	}
+  }

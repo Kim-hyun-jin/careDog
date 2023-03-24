@@ -1,0 +1,111 @@
+@charset "UTF-8";
+.hotel_mainImg {
+	width: 100%;
+	background: url("/img/hotel/hotel_usage.jpg");
+	background-repeat: no-repeat;
+	height: 230px;
+}
+
+.hotel_usageImg {
+	width: 100%;
+	background: url("/img/hotel/pomeranian-banner.jpg");
+	background-repeat: no-repeat;
+	height: 400px;
+}
+
+.map {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.hotel_title {
+	font-size: 50px;
+	color: #222;
+	letter-spacing: 0;
+	text-align: center;
+	line-height: 1em;
+	margin: 35px 0 20px 0;
+	font-family: 'Jua', sans-serif;
+}
+
+.hotel_use_ment {
+	text-align: center;
+	justify-content: center;
+}
+
+.hotel_use_ment .title {
+	font-size: 30px;
+	margin-bottom: 10px;
+	margin-top: 20px;
+}
+
+.hotel_use_ment .ment {
+	font-size: 20px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+.card-body {
+	text-align: center;
+}
+
+hr {
+	margin: 100px;
+}
+
+.usage_link {
+	list-style: none;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid blue;
+	border-radius: 5px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.usage_link:hover {
+	background-color: blue;
+	color: white;
+}
+
+a {
+	text-decoration: none;
+}
+
+h1 {
+	margin-top: 30px;
+	text-align: center;
+}
+
+.th_price {
+	font-size: 24px;
+	padding: 5px 30px;
+}
+
+.th {
+	font-size: 19px;
+}
+
+.table_price {
+	width: 90%;
+	margin: auto;
+	text-align: center;
+}
+
+.mid_tr {
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+
+.table_price tbody {
+	border-top: 3px solid yellow;
+	border-bottom: 3px solid yellow;
+}
+
+.table_price th, td {
+	padding: 20px;
+}
+
+.th_tr {
+	margin-bottom: 10px;
+}

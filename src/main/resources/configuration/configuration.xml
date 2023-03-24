@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+    	<setting name="mapUnderscoreToCamelCase" value="true"/>
+    	<setting name="jdbcTypeForNull" value="NULL" />
+    	
+ 	</settings> 
+	<typeAliases>
+		<typeAlias alias="MemberDog"  type="com.oracle.s20221103.dto.MemberDogDTO" />
+		<typeAlias alias="Room" type="com.oracle.s20221103.dto.RoomDTO"/>
+		<typeAlias alias="Hotel" type="com.oracle.s20221103.dto.HotelDTO"/>
+		<typeAlias alias="Reservation" type="com.oracle.s20221103.dto.ReservationDTO"/>
+		<typeAlias alias="Dog"  type="com.oracle.s20221103.dto.DogDTO" />
+		<typeAlias alias="DogType"  type="com.oracle.s20221103.dto.DogTypeDTO" />
+		<typeAlias alias="dogNotice"     type="com.oracle.s20221103.dto.DogNoticeDTO" />
+		<typeAlias alias="Member"  type="com.oracle.s20221103.dto.MemberDTO" />
+		<typeAlias alias="QA"  type="com.oracle.s20221103.dto.QADTO" />
+		<typeAlias alias="BH"  type="com.oracle.s20221103.dto.BHCorrectionDTO" />
+		<typeAlias alias="ResPay" type="com.oracle.s20221103.dto.ResPayDTO"/>
+		<typeAlias alias="Common" type="com.oracle.s20221103.dto.CommonDTO"/>
+		
+		
+		<!-- customerService -->
+		<typeAlias alias="FreeBoard"  type="com.oracle.s20221103.dto.FreeBoardDTO" />
+		<typeAlias alias="Page"  type="com.oracle.s20221103.dto.PageDTO" />
+		<typeAlias alias="Criteria"  type="com.oracle.s20221103.dto.CriteriaDTO" />
+		<typeAlias alias="FreeReply"  type="com.oracle.s20221103.dto.FreeReplyDTO" />
+		<typeAlias alias="CusNotice" type="com.oracle.s20221103.dto.CusNoticeDTO"/>
+		<typeAlias alias="SearchForm" type="com.oracle.s20221103.khj.dto.SearchFormDTO"/>
+		<typeAlias alias="Image" type="com.oracle.s20221103.dto.ImageDTO"/>
+		<typeAlias alias="RecommandLog" type="com.oracle.s20221103.dto.RecommandLogDTO"/>
+		<!-- customerService -->
+	</typeAliases>
+</configuration>
